@@ -1,7 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_sms_listener/flutter_sms_listener.dart';
 
 void main() {
@@ -14,34 +16,42 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  static const String LISTEN_MSG = 'Listening to sms...';
+  static const String NEW_MSG = 'Captured new message!';
+  String _status = LISTEN_MSG;
+
+  FlutterSmsListener _smsListener = FlutterSmsListener();
+  List<SmsMessage> _messagesCaptured = <SmsMessage>[];
+
+  final _dateFormat = DateFormat('E, ').add_jm();
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-  }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      /* platformVersion =
-          await FlutterSmsListener.platformVersion ?? 'Unknown platform version';*/
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+    if (!Platform.isAndroid) {
+      return;
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      _beginListening();
+    });
+  }
 
-    // setState(() {
-    //   _platformVersion = platformVersion;
-    // });
+  void _beginListening() {
+    _smsListener.onSmsReceived!.listen((message) {
+      _messagesCaptured.add(message);
+
+      setState(() {
+        _status = NEW_MSG;
+      });
+
+      Future.delayed(Duration(seconds: 5)).then((_) {
+        setState(() {
+          _status = LISTEN_MSG;
+        });
+      });
+    });
   }
 
   @override
@@ -49,10 +59,42 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Sms Listener'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                height: 12,
+              ),
+              Text(_status),
+              _messagesCaptured.isEmpty
+                  ? Center(
+                      child: Text('No message found'),
+                    )
+                  : ListView.separated(
+                      itemCount: _messagesCaptured.length,
+                      itemBuilder: (context, index) => ListTile(
+                        contentPadding: EdgeInsets.all(4),
+                        title: Text(
+                          _messagesCaptured[index].address ?? '',
+                          style: TextStyle(fontSize: 14, color: Colors.black),
+                        ),
+                        subtitle: Text(
+                          _messagesCaptured[index].body ?? '',
+                          style: TextStyle(fontSize: 12, color: Colors.black87),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: Text(_dateFormat.format(
+                            _messagesCaptured[index].date ?? DateTime.now())),
+                      ),
+                      shrinkWrap: true,
+                      separatorBuilder: (context, _) => SizedBox(
+                        height: 8,
+                      ),
+                    ),
+            ],
+          ),
         ),
       ),
     );

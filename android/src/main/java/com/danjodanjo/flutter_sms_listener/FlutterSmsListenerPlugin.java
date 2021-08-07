@@ -30,6 +30,7 @@ import io.flutter.plugin.common.EventChannel.StreamHandler;
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.JSONMethodCodec;
 import io.flutter.plugin.common.PluginRegistry;
+import io.flutter.embedding.android.FlutterActivity;
 
 /** FlutterSmsListenerPlugin */
 public class FlutterSmsListenerPlugin implements FlutterPlugin, ActivityAware, StreamHandler, PluginRegistry.RequestPermissionsResultListener {
@@ -45,8 +46,8 @@ public class FlutterSmsListenerPlugin implements FlutterPlugin, ActivityAware, S
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     channel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "com.danjodanjo/flutter_sms_listener", JSONMethodCodec.INSTANCE);
-    channel.setStreamHandler(this);
     this.flutterPluginBinding = flutterPluginBinding;
+    channel.setStreamHandler(this);
   }
 
   @Override
@@ -59,7 +60,7 @@ public class FlutterSmsListenerPlugin implements FlutterPlugin, ActivityAware, S
   public void onAttachedToActivity(ActivityPluginBinding binding) {
     binding.addRequestPermissionsResultListener(Permissions.getRequestsResultsListener());
 
-    this.permissions = new Permissions(binding.getActivity());
+    this.permissions = new Permissions((FlutterActivity)binding.getActivity());
     binding.addRequestPermissionsResultListener(this);
   }
 
@@ -81,10 +82,11 @@ public class FlutterSmsListenerPlugin implements FlutterPlugin, ActivityAware, S
   // Stream handler implementation
   @Override
   public void onListen(Object arguments, EventSink events) {
+    Log.d("SmsListener", "Listening....");
     this.receiver = createReceiver(events);
     flutterPluginBinding.getApplicationContext().registerReceiver(this.receiver, new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION));
-    this.permissions.checkAndRequestPermission(new String[] {Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, Permissions.RECV_SMS_ID_REQ);
     this.eventSink = events;
+    this.permissions.checkAndRequestPermission(new String[] {Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, Permissions.RECV_SMS_ID_REQ);
   }
 
   @Override

@@ -1,7 +1,8 @@
 name: flutter_sms_listener
-description: A new flutter plugin project.
-version: 0.0.1
-homepage:
+description: An extracted package from sms to listen to received sms. Currently only works for android.
+version: 0.1.1
+author: "Dan <danjo3501@gmail.com>"
+repository: https://github.com/danjodanjo/fluttter_sms_listener
 
 environment:
   sdk: ">=2.12.0 <3.0.0"

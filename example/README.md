@@ -1,6 +1,6 @@
 # flutter_sms_listener_example
 
-Demonstrates how to use the flutter_sms_listener plugin.
+Demonstrates how to use flutter_sms_listener plugin
 
 ## Getting Started
 

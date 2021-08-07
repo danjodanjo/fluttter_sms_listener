@@ -3,6 +3,7 @@ package com.danjodanjo.flutter_sms_listener.permissions;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 
 import io.flutter.plugin.common.PluginRegistry;
 
@@ -42,14 +43,18 @@ public class Permissions {
 
     public boolean checkAndRequestPermission(String[] permissions, int id) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            Log.d("SmsListener", "Goes here");
             return true;
         }
+        Log.d("SmsListener", "Checking permission..");
         if (!hasPermissions(permissions)) {
+            Log.d("SmsListener", "No permission.. requesting.");
             PermissionsRequestHandler.requestPermissions(
                     new PermissionsRequest(id, permissions, activity)
             );
             return false;
         }
+        Log.d("SmsListener", "Has permission");
         return true;
     }
 }

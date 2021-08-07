@@ -11,10 +11,13 @@ class FlutterSmsListener {
     if (_messageStream != null) {
       return _messageStream;
     }
-    return _channel
+
+    _messageStream = _channel
         .receiveBroadcastStream()
         .where((event) => event is Map<String, dynamic>)
         .map((msgJson) => SmsMessage.fromJson(msgJson));
+
+    return _messageStream;
   }
 }
 
@@ -42,7 +45,7 @@ class SmsMessage extends Comparable<SmsMessage> {
         threadId: json['thread_id'],
         address: json['address'],
         body: json['body'],
-        read: json['read'],
+        read: json['read'] != null ? (json['read'] == 1) : null,
         date: json['date'] != null
             ? DateTime.fromMillisecondsSinceEpoch(json['date'])
             : null,
