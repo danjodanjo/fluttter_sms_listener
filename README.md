@@ -17,7 +17,7 @@ Adding package to project
 
 ```yaml
 dependencies:
-    flutter_sms_listener: ^0.1.1
+    flutter_sms_listener: ^0.1.2
 ```
 
 Import

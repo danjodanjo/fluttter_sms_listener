@@ -1,3 +1,6 @@
+## 0.1.2
+Updated readme.md
+
 ## 0.1.1
 Minor fix
 * Added readme.md support
