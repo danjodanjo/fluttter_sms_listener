@@ -17,7 +17,7 @@ Adding package to project
 
 ```yaml
 dependencies:
-    flutter_sms_listener: ^0.1.0
+    flutter_sms_listener: ^0.1.1
 ```
 
 Import
@@ -31,7 +31,7 @@ import 'package:flutter_sms_listener/flutter_sms_listener';
 ```dart
 void main() {
     FlutterSmsListener smsListener = FlutterSmsListener();
-    
+
     smsListener.onSmsReceived((SmsMessage) {
         // Do something with sms message
     });
